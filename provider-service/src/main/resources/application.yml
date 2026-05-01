@@ -1,0 +1,57 @@
+server:
+  port: 8082   # Each microservice runs on its own port: auth=8081, provider=8082
+
+spring:
+  application:
+    name: provider-service
+  cache:
+    type: redis
+  datasource:
+    # provider_db is completely separate from auth_db — database-per-service principle
+    url: jdbc:mysql://localhost:3306/provider_db
+    username: root
+    password: hag11990
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      # update: Hibernate auto-creates/alters tables on startup — good for dev
+      # use validate or none in production
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      timeout: 2s
+
+# JWT secret MUST match auth-service exactly — both services share the same
+# signing key so provider-service can verify tokens issued by auth-service
+jwt:
+  secret: medibook-super-secret-key-must-be-at-least-256-bits-long-for-hs256
+
+# Base URL of auth-service — used by JwtValidationFilter to call /validate
+auth:
+  service:
+    url: http://localhost:8081
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+
+logging:
+  level:
+    com.medibook.provider: DEBUG
+    org.springframework.security: INFO
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics
