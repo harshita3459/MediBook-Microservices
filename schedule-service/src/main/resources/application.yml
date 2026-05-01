@@ -1,0 +1,44 @@
+server:
+  port: 8083   # auth=8081, provider=8082, schedule=8083
+
+spring:
+  application:
+    name: schedule-service
+  datasource:
+    # schedule_db owns only availability_slots table — completely isolated from other services
+    url: jdbc:mysql://localhost:3306/schedule_db
+    username: root
+    password: hag11990
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        # IMPORTANT: optimistic locking requires Hibernate to use versioned updates.
+        # This is automatic when @Version is on the entity — no extra config needed.
+
+# JWT secret MUST match auth-service exactly — shared key for token validation
+jwt:
+  secret: medibook-super-secret-key-must-be-at-least-256-bits-long-for-hs256
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+
+logging:
+  level:
+    com.medibook.schedule: DEBUG
+    org.springframework.security: INFO
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics
