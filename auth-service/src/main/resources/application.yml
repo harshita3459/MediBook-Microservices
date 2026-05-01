@@ -1,0 +1,71 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: auth-service
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/auth_db
+    username: root
+    password: hag11990
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: YOUR_GOOGLE_CLIENT_ID
+            client-secret: YOUR_GOOGLE_CLIENT_SECRET
+            scope: email, profile
+            # Authorized Redirect URI to add in Google Cloud Console:
+            # http://localhost:8081/login/oauth2/code/google
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+          github:
+            client-id: YOUR_GITHUB_ID
+            client-secret: YOUR_GITHUB_SECRET
+            scope: user:email
+            # Authorization callback URL to add in GitHub OAuth App:
+            # http://localhost:8081/login/oauth2/code/github
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+
+jwt:
+  secret: medibook-super-secret-key-must-be-at-least-256-bits-long-for-hs256
+  expiration: 86400000       # 24 hours in milliseconds
+  refresh-expiration: 604800000  # 7 days
+
+# Swagger UI: http://localhost:8081/swagger-ui/index.html
+# Raw JSON:   http://localhost:8081/v3/api-docs
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+    disable-swagger-default-url: true
+
+logging:
+  level:
+    com.medibook.auth: DEBUG
+    org.springframework.security: INFO
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics
+
+medibook:
+  frontend:
+    url: http://localhost:5173   # Override with MEDIBOOK_FRONTEND_URL env var in production
+
