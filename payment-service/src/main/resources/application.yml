@@ -1,0 +1,50 @@
+server:
+  port: 8085
+
+spring:
+  application:
+    name: payment-service
+  cache:
+    type: redis
+  datasource:
+    url: jdbc:mysql://localhost:3306/payment_db
+    username: root
+    password: hag11990
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      timeout: 2s
+
+jwt:
+  secret: medibook-super-secret-key-must-be-at-least-256-bits-long-for-hs256
+
+services:
+  appointment-url: http://localhost:8080/internal/appointments
+  notification-url: http://localhost:8080/internal/notifications
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+
+logging:
+  level:
+    com.medibook.payment: DEBUG
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics
