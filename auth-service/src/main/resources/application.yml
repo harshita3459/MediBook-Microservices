@@ -25,15 +25,15 @@ spring:
       client:
         registration:
           google:
-            client-id: YOUR_GOOGLE_CLIENT_ID
-            client-secret: YOUR_GOOGLE_CLIENT_SECRET
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
             scope: email, profile
             # Authorized Redirect URI to add in Google Cloud Console:
             # http://localhost:8081/login/oauth2/code/google
             redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
           github:
-            client-id: YOUR_GITHUB_ID
-            client-secret: YOUR_GITHUB_SECRET
+            client-id: ${GITHUB_CLIENT_ID}
+            client-secret: ${GITHUB_CLIENT_ID}
             scope: user:email
             # Authorization callback URL to add in GitHub OAuth App:
             # http://localhost:8081/login/oauth2/code/github
@@ -69,3 +69,9 @@ medibook:
   frontend:
     url: http://localhost:5173   # Override with MEDIBOOK_FRONTEND_URL env var in production
 
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true

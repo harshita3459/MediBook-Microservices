@@ -1,0 +1,8 @@
+.env
+**/application-local.yml
+target/
+.idea/
+.settings/
+.project
+.classpath
+*.log
