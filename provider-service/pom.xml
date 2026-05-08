@@ -27,6 +27,7 @@
         <!-- jjwt 0.12.6 — same as auth-service, used here only to VALIDATE
              tokens forwarded by the API gateway / medibook-web layer -->
         <jjwt.version>0.12.6</jjwt.version>
+        <spring-cloud.version>2025.1.0</spring-cloud.version>
     </properties>
 
     <dependencies>
@@ -113,7 +114,26 @@
             <artifactId>spring-security-test</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <!-- Eureka Client -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+        </dependency>
+
     </dependencies>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <build>
         <plugins>
