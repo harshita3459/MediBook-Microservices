@@ -54,5 +54,16 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
             """)
     List<Appointment> findScheduledBeforeDate(@Param("today") LocalDate today);
 
-	Object findActiveConflictForPatient(long eq, LocalDate any, LocalTime any2);
+    @Query("""
+    	    SELECT a FROM Appointment a
+    	    WHERE a.patientId = :patientId
+    	      AND a.appointmentDate = :appointmentDate
+    	      AND a.startTime = :startTime
+    	      AND a.status = 'SCHEDULED'
+    	""")
+    	Optional<Appointment> findActiveConflictForPatient(
+    	        @Param("patientId") Long patientId,
+    	        @Param("appointmentDate") LocalDate appointmentDate,
+    	        @Param("startTime") LocalTime startTime
+    	);
 }
