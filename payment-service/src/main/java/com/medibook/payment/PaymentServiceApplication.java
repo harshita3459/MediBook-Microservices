@@ -1,6 +1,7 @@
 package com.medibook.payment;
 
 import org.springframework.boot.SpringApplication;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
@@ -16,6 +17,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * Called by: appointment-service (on booking + cancellation)
  * Calls:     notification-service (payment receipt dispatch)
  */
+@EnableFeignClients
 @SpringBootApplication
 public class PaymentServiceApplication {
     public static void main(String[] args) {
