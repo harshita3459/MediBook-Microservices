@@ -53,32 +53,16 @@ public class AppointmentServiceImpl implements AppointmentService {
     public AppointmentResponse bookAppointment(BookAppointmentRequest req) {
         log.info("Booking appointment: patientId={} slotId={}", req.getPatientId(), req.getSlotId());
 
-        // ── Guard 1: Slot must not have an ACTIVE (SCHEDULED/RESCHEDULED) appointment ──
-        // CANCELLED / COMPLETED / NO_SHOW records are excluded so released slots
-        // become bookable again after cancellation.
-        appointmentRepository.findActiveBySlotId(req.getSlotId()).ifPresent(existing -> {
+        if (appointmentRepository.findBySlotId(req.getSlotId()).isPresent()) {
             throw new AppointmentAlreadyExistsException(
                     "Slot " + req.getSlotId() + " is already booked by another appointment");
-        });
+        }
 
         Map<String, Object> slotDetails = fetchSlotDetails(req.getSlotId());
         LocalDate slotDate = parseLocalDate(slotDetails.get("slotDate"));
         LocalTime startTime = parseLocalTime(slotDetails.get("startTime"));
         LocalTime endTime = parseLocalTime(slotDetails.get("endTime"));
         validateBookableSlot(req.getProviderId(), slotDetails, slotDate, startTime);
-
-        // ── Guard 2: Patient must not have an ACTIVE appointment at the same date+time ──
-        // Prevents double-booking across different providers at the same time slot.
-        // Only SCHEDULED/RESCHEDULED are blocking — CANCELLED/COMPLETED are NOT.
-        if (slotDate != null && startTime != null) {
-            appointmentRepository.findActiveConflictForPatient(req.getPatientId(), slotDate, startTime)
-                    .ifPresent(conflict -> {
-                        throw new AppointmentAlreadyExistsException(
-                                "You already have an appointment at " + startTime +
-                                " on " + slotDate + " (Appointment #" + conflict.getAppointmentId() + "). " +
-                                "Please choose a different time slot.");
-                    });
-        }
 
         Appointment tempAppointment = Appointment.builder()
                 .patientId(req.getPatientId())
@@ -115,20 +99,12 @@ public class AppointmentServiceImpl implements AppointmentService {
                             + ". Only SCHEDULED appointments can be cancelled.");
         }
 
-        Long releasedSlotId = appt.getSlotId();
-        releaseSlotInScheduleService(releasedSlotId);
-
+        releaseSlotInScheduleService(appt.getSlotId());
         appt.setStatus(AppointmentStatus.CANCELLED);
         appt.setCancellationReason(reason);
-
-        // CRITICAL FIX: Set slotId to null after releasing so the DB unique constraint
-        // on slot_id does not block future bookings of the same slot.
-        // The slot has already been released in schedule-service above.
-        appt.setSlotId(null);
-
         Appointment cancelled = appointmentRepository.save(appt);
 
-        log.info("Appointment CANCELLED: id={} slotId={} reason={}", appointmentId, releasedSlotId, reason);
+        log.info("Appointment CANCELLED: id={} reason={}", appointmentId, reason);
         sendNotificationSafely("APPOINTMENT_CANCELLED", cancelled);
         return AppointmentResponse.from(cancelled);
     }

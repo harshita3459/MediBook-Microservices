@@ -25,33 +25,8 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     List<Appointment> findByProviderIdAndAppointmentDateOrderByStartTimeAsc(
             Long providerId, LocalDate date);
 
-    /**
-     * Find appointment by slotId — only considers ACTIVE statuses.
-     * CANCELLED / COMPLETED / NO_SHOW appointments do NOT block a slot from being re-booked.
-     */
-    @Query("""
-            SELECT a FROM Appointment a
-            WHERE a.slotId = :slotId
-              AND a.status IN ('SCHEDULED', 'RESCHEDULED')
-            """)
-    Optional<Appointment> findActiveBySlotId(@Param("slotId") Long slotId);
-
-    /**
-     * Check whether a patient already has an ACTIVE appointment at the exact
-     * same date and start-time (regardless of provider).
-     * Used to prevent double-booking across different providers.
-     */
-    @Query("""
-            SELECT a FROM Appointment a
-            WHERE a.patientId = :patientId
-              AND a.appointmentDate = :date
-              AND a.startTime = :startTime
-              AND a.status IN ('SCHEDULED', 'RESCHEDULED')
-            """)
-    Optional<Appointment> findActiveConflictForPatient(
-            @Param("patientId") Long patientId,
-            @Param("date") LocalDate date,
-            @Param("startTime") java.time.LocalTime startTime);
+    /** Find appointment by slotId — ensures one appointment per slot */
+    Optional<Appointment> findBySlotId(Long slotId);
 
     /** Patient's upcoming appointments (SCHEDULED status, future dates) */
     @Query("""
@@ -78,4 +53,6 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
               AND a.appointmentDate < :today
             """)
     List<Appointment> findScheduledBeforeDate(@Param("today") LocalDate today);
+
+	Object findActiveConflictForPatient(long eq, LocalDate any, LocalTime any2);
 }

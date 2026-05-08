@@ -50,14 +50,9 @@ public class Appointment {
     @Column(name = "provider_id", nullable = false)
     private Long providerId;
 
-    /**
-     * References availability_slots.slot_id in schedule_db.
-     * NOTE: Not unique at the DB level — a slot_id can appear as null in multiple
-     * cancelled appointments (after cancellation the slot_id is cleared to null
-     * so the slot can be re-booked). Uniqueness of ACTIVE bookings is enforced
-     * by the application via findActiveBySlotId query.
-     */
-    @Column(name = "slot_id")
+    /** References availability_slots.slot_id in schedule_db */
+    @NotNull
+    @Column(name = "slot_id", nullable = false, unique = true)
     private Long slotId;
 
     @Column(name = "appointment_date", nullable = false)
