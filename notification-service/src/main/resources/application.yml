@@ -1,0 +1,102 @@
+server:
+  port: 8087
+
+spring:
+  application:
+    name: notification-service
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/notification_db
+    username: root
+    password: hag11990
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  # ── RabbitMQ Configuration ─────────────────────────────────────────────────
+  # RabbitMQ runs on localhost:5672 by default after installation.
+  # Guest/guest credentials work out of the box for local development.
+  # Management UI is available at: http://localhost:15672
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+    virtual-host: /
+    # Automatic reconnection if RabbitMQ restarts
+    connection-timeout: 30000
+    listener:
+      simple:
+        # How many messages to fetch at a time per consumer thread
+        prefetch: 1
+        # AUTO = Spring ACKs automatically after @RabbitListener method returns
+        # MANUAL = you call channel.basicAck() yourself (use for critical messages)
+        acknowledge-mode: auto
+        # Retry config — retries failed message processing before sending to DLQ
+        retry:
+          enabled: true
+          initial-interval: 1000   # 1s before first retry
+          max-retries: 3          # try 3 times total
+          multiplier: 2            # wait doubles each retry: 1s → 2s → 4s
+
+  # ── Email Configuration ────────────────────────────────────────────────────
+  # Using Gmail SMTP as an example.
+  # For production use AWS SES or SendGrid — much higher rate limits.
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: your-gmail@gmail.com          # replace with your Gmail
+    password: your-app-password             # Gmail App Password (not login password)
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+
+# JWT secret — must match auth-service
+jwt:
+  secret: medibook-super-secret-key-must-be-at-least-256-bits-long-for-hs256
+
+# Application-level notification config
+notification:
+  email:
+    from: noreply@medibook.com
+    enabled: true        # set false in test to skip real email sending
+  sms:
+    enabled: false       # SMS via Twilio — disabled by default, enable when configured
+    twilio:
+      account-sid: YOUR_TWILIO_SID
+      auth-token:  YOUR_TWILIO_TOKEN
+      from-number: "+1234567890"
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+
+logging:
+  level:
+    com.medibook.notification: DEBUG
+    org.springframework.amqp: INFO      # set DEBUG to see every RabbitMQ message
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics			
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
