@@ -1,4 +1,4 @@
-name: SonarCloud
+name: SonarCloud Analysis
 
 on:
   push:
@@ -9,9 +9,25 @@ on:
     types: [opened, synchronize, reopened]
 
 jobs:
-  build:
-    name: Build and Analyze
+
+  analyze:
     runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        service:
+          - api-gateway
+          - auth-service
+          - provider-service
+          - schedule-service
+          - appointment-service
+          - payment-service
+          - review-service
+          - notification-service
+          - record-service
+          - eureka-server
+
+    name: Analyze ${{ matrix.service }}
 
     steps:
       - name: Checkout Code
@@ -30,19 +46,20 @@ jobs:
         with:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
-          restore-keys: ${{ runner.os }}-sonar
 
       - name: Cache Maven packages
         uses: actions/cache@v4
         with:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-m2
 
       - name: Build and Analyze
+        working-directory: ${{ matrix.service }}
+
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
         run: |
           mvn -B clean verify sonar:sonar \
-          -Dsonar.projectKey=harshita3459_MediBook-Microservices \
+          -Dsonar.projectKey=harshita3459_${{ matrix.service }} \
           -Dsonar.organization=harshita3459
