@@ -1,0 +1,32 @@
+# Test profile — H2 in-memory DB, RabbitMQ and mail disabled
+spring:
+  datasource:
+    url: jdbc:h2:mem:notification_test_db;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    database-platform: org.hibernate.dialect.H2Dialect
+    show-sql: false
+
+  # Disable RabbitMQ auto-configuration in tests
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration
+
+  # Disable mail in tests
+  mail:
+    host: localhost
+    port: 3025
+
+jwt:
+  secret: medibook-super-secret-key-must-be-at-least-256-bits-long-for-hs256
+
+notification:
+  email:
+    from: test@medibook.com
+    enabled: false    # no real emails in tests
+  sms:
+    enabled: false
