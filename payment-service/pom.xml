@@ -22,6 +22,8 @@
         <java.version>17</java.version>
         <jjwt.version>0.12.6</jjwt.version>
         <spring-cloud.version>2025.1.0</spring-cloud.version>
+        <sonar.organization>harshita3459</sonar.organization>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     </properties>
 
     <dependencies>
@@ -83,6 +85,11 @@
                         <path><groupId>org.projectlombok</groupId><artifactId>lombok</artifactId></path>
                     </annotationProcessorPaths>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.sonarsource.scanner.maven</groupId>
+                <artifactId>sonar-maven-plugin</artifactId>
+                <version>4.0.0.4121</version>
             </plugin>
         </plugins>
     </build>
