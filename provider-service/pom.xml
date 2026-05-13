@@ -28,6 +28,7 @@
              tokens forwarded by the API gateway / medibook-web layer -->
         <jjwt.version>0.12.6</jjwt.version>
         <spring-cloud.version>2025.1.0</spring-cloud.version>
+        <start-class>com.medibook.provider.ProviderServiceApplication</start-class>
         <sonar.organization>harshita3459</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     </properties>

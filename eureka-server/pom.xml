@@ -21,6 +21,7 @@
     <properties>
         <java.version>17</java.version>
         <spring-cloud.version>2025.1.0</spring-cloud.version>
+        <start-class>com.medibook.eureka.EurekaServerApplication</start-class>
         <sonar.organization>harshita3459</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     </properties>
