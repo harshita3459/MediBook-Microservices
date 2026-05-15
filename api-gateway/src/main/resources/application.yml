@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: ${PORT:8080}
 
 spring:
   application:
@@ -15,6 +15,7 @@ spring:
                   - "http://localhost:3000"
                   - "http://localhost:5173"
                   - "http://localhost:*"
+                  - "${MEDIBOOK_FRONTEND_URL:http://localhost:5173}"
                 allowedMethods:
                   - GET
                   - POST
@@ -27,19 +28,19 @@ spring:
             - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
           routes:
             - id: auth-public
-              uri: http://localhost:8081
+              uri: ${AUTH_SERVICE_URL:http://localhost:8081}
               predicates:
                 - Path=/api/v1/auth/login,/api/v1/auth/register,/api/v1/auth/refresh,/api/v1/auth/validate
 
             - id: auth-protected
-              uri: http://localhost:8081
+              uri: ${AUTH_SERVICE_URL:http://localhost:8081}
               predicates:
                 - Path=/api/v1/auth/**
               filters:
                 - name: JwtAuthFilter
 
             - id: provider-internal-rating
-              uri: http://localhost:8082
+              uri: ${PROVIDER_SERVICE_URL:http://localhost:8082}
               predicates:
                 - Path=/internal/providers/{id}/rating
                 - Method=PUT
@@ -47,26 +48,26 @@ spring:
                 - RewritePath=/internal/providers/(?<id>[^/]+)/rating,/api/v1/providers/$\{id}/rating
 
             - id: provider-public
-              uri: http://localhost:8082
+              uri: ${PROVIDER_SERVICE_URL:http://localhost:8082}
               predicates:
                 - Path=/api/v1/providers
                 - Method=GET
 
             - id: provider-public-search
-              uri: http://localhost:8082
+              uri: ${PROVIDER_SERVICE_URL:http://localhost:8082}
               predicates:
                 - Path=/api/v1/providers/search,/api/v1/providers/specialization/**,/api/v1/providers/city/**,/api/v1/providers/top-rated,/api/v1/providers/fee-range,/api/v1/providers/{id}
                 - Method=GET
 
             - id: provider-protected
-              uri: http://localhost:8082
+              uri: ${PROVIDER_SERVICE_URL:http://localhost:8082}
               predicates:
                 - Path=/api/v1/providers/**
               filters:
                 - name: JwtAuthFilter
 
             - id: schedule-internal
-              uri: http://localhost:8083
+              uri: ${SCHEDULE_SERVICE_URL:http://localhost:8083}
               predicates:
                 - Path=/internal/slots/{id}/book,/internal/slots/{id}/release
                 - Method=PUT
@@ -74,13 +75,13 @@ spring:
                 - RewritePath=/internal/slots/(?<id>[^/]+)/(?<action>book|release),/api/v1/slots/$\{id}/$\{action}
 
             - id: schedule-public
-              uri: http://localhost:8083
+              uri: ${SCHEDULE_SERVICE_URL:http://localhost:8083}
               predicates:
                 - Path=/api/v1/slots/available,/api/v1/slots/available/**,/api/v1/slots/{id}
                 - Method=GET
 
             - id: schedule-protected
-              uri: http://localhost:8083
+              uri: ${SCHEDULE_SERVICE_URL:http://localhost:8083}
               predicates:
                 - Path=/api/v1/slots/**
               filters:
@@ -181,6 +182,6 @@ management:
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka/}
   instance:
     prefer-ip-address: true
