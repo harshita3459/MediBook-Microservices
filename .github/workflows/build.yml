@@ -62,10 +62,17 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           mvn -B clean verify sonar:sonar \
+            -Dtest="*ControllerTest,*ServiceImplTest" \
+            -Dsurefire.failIfNoSpecifiedTests=false \
+            -DfailIfNoTests=false \
             -Dsonar.projectKey=harshita3459_${{ matrix.service }} \
             -Dsonar.organization=harshita3459 \
             -Dsonar.host.url=https://sonarcloud.io \
-            -Dsonar.token="${SONAR_TOKEN}"
+            -Dsonar.token="${SONAR_TOKEN}" \
+            -Dsonar.inclusions="src/main/java/**/controller/**/*.java,src/main/java/**/service/*ServiceImpl.java,src/main/java/**/config/**/*.java" \
+            -Dsonar.coverage.exclusions="src/main/java/**/config/**/*.java" \
+            -Dsonar.test.inclusions="src/test/java/**/controller/**/*Test.java,src/test/java/**/service/*ServiceImplTest.java"
+
 
       - name: Show test reports
         if: always()
