@@ -1,11 +1,13 @@
 package com.medibook.gateway.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.CorsWebFilter;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -15,10 +17,23 @@ import java.util.List;
 @Configuration
 public class CorsConfig {
 
+    @Value("${MEDIBOOK_FRONTEND_URL:}")
+    private String frontendUrl;
+
     @Bean
     public CorsWebFilter corsWebFilter() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOriginPatterns(List.of("http://localhost:*", "https://*.medibook.com"));
+
+        List<String> origins = new ArrayList<>(List.of(
+            "http://localhost:*",
+            "https://*.onrender.com",
+            "https://*.medibook.com"
+        ));
+        if (frontendUrl != null && !frontendUrl.isBlank()) {
+            origins.add(frontendUrl);
+        }
+
+        config.setAllowedOriginPatterns(origins);
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
@@ -29,3 +44,4 @@ public class CorsConfig {
         return new CorsWebFilter(source);
     }
 }
+
